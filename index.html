@@ -35,13 +35,13 @@
     <div class="grid md:grid-cols-2 gap-4 mt-6 text-left">
       <div class="bg-white/60 text-gray-800 rounded-lg p-4">
          <div style="display: flex; justify-content: center;">
-          <h3 style="font-family: Clarendon Blk BT, sans-serif;"class="font-bold text-blue-700 mb-2">JADWAL PAGI</h3>
+          <h3 style="font-family: Rockwell Extra Bold, sans-serif;"class="font-bold text-blue-700 mb-2">JADWAL PAGI</h3>
          </div>
         <ul id="schedulePagi" class="space-y-2 text-sm"></ul>
       </div>
       <div class="bg-white/60 text-gray-800 rounded-lg p-4">
           <div style="display: flex; justify-content: center;">
-          <h3 style="font-family: Clarendon Blk BT, sans-serif;"class="font-bold text-orange-600 mb-2">JADWAL SIANG</h3>
+          <h3 style="font-family: Rockwell Extra Bold, sans-serif;"class="font-bold text-blue-600 mb-2">JADWAL SIANG</h3>
           </div>
         <ul id="scheduleSiang" class="space-y-2 text-sm"></ul>
       </div>
@@ -54,16 +54,16 @@
 
 <!-- SUARA -->
 <div class="bg-white/70 rounded-xl p-6 shadow">
-<h2 class="font-bold text-blue-700 mb-3">🔊 Suara Bell</h2>
+<h2 style="display: flex; justify-content: center;"class="font-bold text-blue-700 mb-3">🔊 SUARA</h2>
 <input type="file" id="soundFile" accept="audio/*" class="mb-2 w-full">
 <input type="text" id="soundName" placeholder="Nama suara" class="border p-2 w-full mb-2">
-<button id="addSound" class="w-full bg-blue-600 text-white py-2 rounded">Simpan Suara</button>
+<button style="font-family: Rockwell Extra Bold, sans-serif;id="addSound" class="w-full bg-blue-600 text-white py-2 rounded">Simpan Suara</button>
 <ul id="soundList" class="mt-3 text-sm"></ul>
 </div>
 
 <!-- JADWAL -->
 <div class="bg-white/70 rounded-xl p-6 shadow">
-<h2 class="font-bold text-blue-700 mb-3">⏰ Kelola Jadwal</h2>
+<h2 style="display: flex; justify-content: center;"class="font-bold text-blue-700 mb-3">⏰ JADWAL</h2>
 <input type="time" id="bellTime" class="border p-2 w-full mb-2">
 <input type="text" id="bellNote" placeholder="Keterangan" class="border p-2 w-full mb-2">
 <select id="soundSelect" class="border p-2 w-full mb-2"></select>
@@ -71,7 +71,7 @@
   <option value="pagi">Pagi</option>
   <option value="siang">Siang</option>
 </select>
-<button id="saveSchedule" class="w-full bg-green-600 text-white py-2 rounded">
+<button style="font-family: Rockwell Extra Bold, sans-serif;id="saveSchedule" class="w-full bg-green-600 text-white py-2 rounded">
 Tambah Jadwal
 </button>
 </div>
@@ -79,8 +79,15 @@ Tambah Jadwal
 
 <!-- UPLOAD GAMBAR -->
 <div class="bg-white/75 rounded-xl p-6 shadow mt-6">
-<h3 class="font-bold text-blue-700 mb-3">🖼️ Background Slider</h3>
+<h3 class="font-bold text-blue-700 mb-3">💾 Backup & Restore </h3>
+<button onclick="backupData()" class="bg-blue-600 text-white px-4 py-2 rounded mr-2">
+⬇️ Backup Data
+</button>
 
+<input type="file" id="restoreFile" accept=".json" class="hidden" onchange="restoreData(this)">
+<button onclick="restoreFile.click()" class="bg-green-600 text-white px-4 py-2 rounded">
+♻️ Restore Data
+</button>
 <input type="file" id="imageUpload" accept="image/*" multiple class="mb-3">
 
 <ul id="imageList" class="text-sm space-y-1"></ul>
@@ -88,6 +95,8 @@ Tambah Jadwal
 
 </div>
 
+
+</div>
 <audio id="bellAudio"></audio>
 
 <script>
@@ -137,6 +146,7 @@ function hapusImage(i){
  renderImageList(); renderSlider();
 }
 
+
 /* ===== SUARA ===== */
 addSound.onclick=()=>{
  if(!soundFile.files[0]||!soundName.value)return alert("Lengkapi suara");
@@ -182,6 +192,29 @@ function hapus(sess,i){
  localStorage.setItem("schedules",JSON.stringify(schedules));
  renderSchedules();
 }
+/* BACKUP */
+function backupData(){
+ const data={sounds,schedules};
+ const blob=new Blob([JSON.stringify(data)],{type:"application/json"});
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download="backup_bell_sekolah.json";
+ a.click();
+}
+
+function restoreData(input){
+ const r=new FileReader();
+ r.onload=()=>{
+  const d=JSON.parse(r.result);
+  sounds=d.sounds||[];
+  schedules=d.schedules||{pagi:[],siang:[]};
+  localStorage.setItem("sounds",JSON.stringify(sounds));
+  localStorage.setItem("schedules",JSON.stringify(schedules));
+  renderSounds();renderSoundSelect();renderSchedules();
+ };
+ r.readAsText(input.files[0]);
+}
+
 
 /* ===== RENDER ===== */
 function renderSounds(){
